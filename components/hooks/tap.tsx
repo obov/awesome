@@ -15,10 +15,11 @@ export interface Itaps {
   selectedCls?: string[]
 };
 export const makeTapView = (tapObj: Itaps) => {
+  if(tapObj.taps===undefined) return({button:'', view:''})
   const [index, setIndex] = useState(0);
   const handleOnClick = (i: number) => setIndex(i);
   const clsForAllTaps = tapObj.tapsCls?.join(" ");
-  const button = tapObj.taps.map((t, i) => {
+  const button = tapObj.taps?.map((t, i) => {
     const clsForThis = (index:number) => {
       const cls = clsForAllTaps + ' ' + tapObj.taps[i].nameCls?.join(" ");
       if(index === i ) return(cls + ' ' + tapObj.selectedCls?.join(" "));

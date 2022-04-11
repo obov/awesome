@@ -31,7 +31,7 @@ export const MakeTable = (data: dataCheckable) => {
     boxCls,
     checkedDataCls,
   ].map((cls) => cls?.join(" "));
-  const allID = datas.map((row) => row[0]);
+  const allID = datas?.map((row) => row[0])??0;
   const [checkedID, setCheckedID] = useState([] as string[]);
   const handleCheckAll = () => {
     if (checkedID.length !== allID.length)
@@ -96,7 +96,7 @@ export const MakeTable = (data: dataCheckable) => {
   };
   const tbody = (
     <Tbody classNames={tbodyCls?.main}>
-      {datas.map((row, i) => rowToTr(row, i))}
+      {datas?.map((row, i) => rowToTr(row, i))}
     </Tbody>
   );
   const tfoot = (
@@ -116,6 +116,6 @@ export const MakeTable = (data: dataCheckable) => {
       </table>
     </div>
   );
-  const checkedDatas = datas.filter((row) => checkedID.includes(row[0]));
+  const checkedDatas = datas?.filter((row) => checkedID.includes(row[0]));
   return { tableContent, checkedDatas };
 };
