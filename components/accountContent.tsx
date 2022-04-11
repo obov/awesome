@@ -1,6 +1,7 @@
 import { ChangeEvent, useState, useEffect } from "react";
 import { MakeTable, dataCheckable } from "./hooks/table2";
 import { makeTapView } from "./hooks/tap";
+import metaTable from "./metaTable";
 import sorter from "./sortDetails";
 export default function Content() {
   const [txtData, setTxtData] = useState([[]]);
@@ -24,38 +25,41 @@ export default function Content() {
     checkedDataCls: ["shadow", "shadow-slate-400", "rounded-xl"],
   };
   let accountData = MakeTable({ ...dataConfig, datas: txtData });
-  const deposit = sorter(txtData, headers, {
-    head: "출금액(원)",
-    type: "equal",
-    val: "0",
-  });
-  const withdraw = sorter(txtData, headers, {
+  const deposit = sorter({txtData, headers, condition:{ head: "출금액(원)",type: "equal",val: "0",}});
+  const metaDeposit = metaTable(deposit as string[][])
+  
+  const withdraw = sorter({txtData, headers, condition:{
     head: "입금액(원)",
     type: "equal",
     val: "0",
-  });
+  }});
+  const metaWithdraw = metaTable(withdraw as string[][])
   
+  let depositData = MakeTable({ ...dataConfig, datas: deposit });
 
-  let depositData1 = MakeTable({ ...dataConfig, datas: sorter(deposit, headers, {
+  let depositData1 = MakeTable({ ...dataConfig, datas: sorter({txtData:deposit, headers, condition:{
     head: "처리점",
     type: "equal",
     val: "노원종",
-  }) });
-  let depositData2 = MakeTable({ ...dataConfig, datas: sorter(deposit, headers, {
+  }},metaDeposit.whenDataSort) });
+  let depositData2 = MakeTable({ ...dataConfig, datas: sorter({txtData:deposit, headers, condition:{
     head: "처리점",
     type: "equal",
     val: "송림동",
-  }) });
-  let withdrawData1 = MakeTable({ ...dataConfig, datas: sorter(withdraw, headers, {
+  }},metaDeposit.whenDataSort) });
+
+
+  let withdrawData = MakeTable({ ...dataConfig, datas: withdraw});
+  let withdrawData1 = MakeTable({ ...dataConfig, datas: sorter({txtData:withdraw, headers, condition:{
     head: "처리점",
     type: "equal",
     val: "수신상",
-  }) });
-  let withdrawData2 = MakeTable({ ...dataConfig, datas: sorter(withdraw, headers, {
+  }},metaWithdraw.whenDataSort) });
+  let withdrawData2 = MakeTable({ ...dataConfig, datas: sorter({txtData:withdraw, headers, condition:{
     head: "처리점",
     type: "equal",
     val: "대방로",
-  }) });
+  }},metaWithdraw.whenDataSort) });
   const handleChange = (e: ChangeEvent) => {
     const file = e.currentTarget.files[0];
     const reader = new FileReader();
@@ -74,6 +78,10 @@ export default function Content() {
   const depositTvpram = {
     taps: [
       {
+        name: "입금전체",
+        content: depositData.tableContent,
+      },
+      {
         name: "노원종",
         content: depositData1.tableContent,
       },
@@ -87,6 +95,10 @@ export default function Content() {
   const depositTapview = makeTapView(depositTvpram);
   const withdrawTvpram = {
     taps: [
+      {
+        name: "출금전체",
+        content: withdrawData.tableContent,
+      },
       {
         name: "임요한",
         content: withdrawData1.tableContent,
@@ -126,7 +138,6 @@ export default function Content() {
   const tapView = makeTapView(tvpram);
   return (
     <>
-      <div className="w-12 h-12 bg-slate-600"></div>
       <input
         type="file"
         name="inputFile"

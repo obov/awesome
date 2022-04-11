@@ -1,4 +1,7 @@
+import type { NextPage } from 'next'
 import Content from '../components/accountContent'
-export default function Home() {
+const Home : NextPage = () => {
   return <Content/>
 }
+
+export default Home
