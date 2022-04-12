@@ -12,6 +12,7 @@ export interface dataCheckable extends dataClassed {
 }
 
 export const MakeTable = (data: dataCheckable) => {
+  if(data===undefined) return { tableContent:<>data?</> }
   const {
     tableCls,
     theadCls,
@@ -31,7 +32,7 @@ export const MakeTable = (data: dataCheckable) => {
     boxCls,
     checkedDataCls,
   ].map((cls) => cls?.join(" "));
-  const allID = datas?.map((row) => row[0])??0;
+  const allID = datas.map((row) => row[0])??[];
   const [checkedID, setCheckedID] = useState([] as string[]);
   const handleCheckAll = () => {
     if (checkedID.length !== allID.length)

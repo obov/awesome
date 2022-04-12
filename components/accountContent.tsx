@@ -1,10 +1,8 @@
 import { ChangeEvent, useState, useEffect, ChangeEventHandler } from "react";
 import { MakeTable, dataCheckable } from "./hooks/table2";
 import { makeTapView } from "./hooks/tap";
-import sorter from "./sortDetails";
-// interface ChangeEvent extends Event {
-//   target: HTMLInputElement & EventTarget;
-// }
+import sorter from "./sortDetails2";
+
 export default function Content() {
   const [txtData, setTxtData] = useState([[]] as string[][]);
   const [isUpload, setIsUpload] = useState(false);
@@ -43,17 +41,11 @@ export default function Content() {
     boxCls: ["text-red-200"],
     checkedDataCls: ["shadow", "shadow-slate-400", "rounded-xl"],
   };
-  let accountData = MakeTable({ ...dataConfig, datas: txtData });
+  const accountData = MakeTable({ ...dataConfig, datas: txtData });
   
-  const [deposit, withdraw] = [
-    { head: "출금액(원)", type: "equal", val: "0" },
-    {
-      head: "입금액(원)",
-      type: "equal",
-      val: "0",
-    },
-  ].map((e) => sorter({ txtData, headers, condition: e }));
-  const[deposit1,deposit2] = [
+  const {sortedDatas:[deposit],notSorted:withdraw} = sorter({ txtData, headers, condition: [{ head: "출금액(원)", type: "equal", val: "0" }]})
+  
+  const dp = [
     {
       head: "처리점",
       type: "equal",
@@ -64,59 +56,107 @@ export default function Content() {
       type: "equal",
       val: "송림동",
     }
-  ].map((e) => sorter({ txtData:deposit.sorted, headers, condition: e }))
-  const [withdraw1,withdraw2] = [
+  ]
+  const dpsort = sorter({ txtData:deposit, headers, condition: dp })
+  
+  const wd = [
     {
-      head: "처리점",
+      head: "출금계좌메모",
       type: "equal",
-      val: "수신상",
+      val: ["화수방아간","홈마트　송림점","강동수산","인농177번상회","청우상회72","화도정육점","중앙떡집"],
     },
     {
-      head: "처리점",
+      head: "적요",
       type: "equal",
-      val: "대방로",
+      val: ["CMS 공동","FBS출금"],
     },
-  ].map((e) => sorter({ txtData:withdraw.sorted, headers, condition: e }))
-  const [depositData,withdrawData,depositData1,depositData2,withdrawData1,withdrawData2] = 
-  [deposit,withdraw,deposit1,deposit2,withdraw1,withdraw2].map((e)=>MakeTable({ ...dataConfig, datas:e.sorted}));  
+    {
+      head: "의뢰인/수취인",
+      type: "equal",
+      val: ["홈마트송림점","화도정육점","이삭토스트","에그드랍신포점","신라반점"],
+    },
+    {
+      head: "적요",
+      type: "equal",
+      val: ["공과금","지로출금"],
+    },
+    {
+      head: "출금계좌메모",
+      type: "include",
+      val: ["급여","퇴직적립금"],
+    },
+  ]
+  const wdsort = sorter({ txtData:withdraw, headers, condition: wd })
+  const dpTable = [...dpsort.sortedDatas,dpsort.notSorted].map((e)=>MakeTable({ ...dataConfig, datas:e}))
+  const wdTable = [...wdsort.sortedDatas,wdsort.notSorted].map((e)=>MakeTable({ ...dataConfig, datas:e}))
+  const [depositData,withdrawData] = 
+  [deposit,withdraw].map((e)=>MakeTable({ ...dataConfig, datas:e}));  
   const [depositTapview, withdrawTapview] = [
     [
       {
         name: "입금전체",
+        nameCls: ["m-0.5","p-0.5"],
         content: depositData.tableContent,
       },
       {
         name: "노원종",
-        content: depositData1.tableContent,
+        nameCls: ["m-0.5","p-0.5"],
+        content: dpTable[0].tableContent,
       },
       {
         name: "송림동",
-        content: depositData2.tableContent,
+        nameCls: ["m-0.5","p-0.5"],
+        content: dpTable[1].tableContent,
+      },
+      {
+        name: "미분류",
+        nameCls: ["m-0.5","p-0.5"],
+        content: dpTable[2].tableContent,
       },
     ],
     [
       {
-        name: "출금전체",
+        name: <div>{"출금전체 ( )"}</div>,
+        nameCls: ["m-0.5","p-0.5"],
         content: withdrawData.tableContent,
       },
       {
-        name: "임요한",
-        content: withdrawData1.tableContent,
+        name: <div>{"생계비 ( )"}</div>,
+        nameCls: ["m-0.5","p-0.5"],
+        content:wdTable[0].tableContent,
       },
       {
-        name: "문서연",
-        content: withdrawData2.tableContent,
+        name:  <div>{"정기출금 ( )"}</div>,
+        nameCls: ["m-0.5","p-0.5"],
+        content:wdTable[1].tableContent,
+      },
+      {
+        name: <div>{"공과금 ( )"}</div>,
+        nameCls: ["m-0.5","p-0.5"],
+        content: wdTable[2].tableContent,
+      },
+      {
+        name: <div>{"급여 ( )"}</div>,
+        nameCls: ["m-0.5","p-0.5"],
+        content: wdTable[3].tableContent,
+      },
+      {
+        name: <div>{"미분류 ( )"}</div>,
+        nameCls: ["m-0.5","p-0.5"],
+        content: wdTable[5].tableContent,
       },
     ]
-  ].map((e)=> makeTapView({taps:e}))
+  ].map((e)=> makeTapView({taps:e,selectedCls: ["font-semibold"]}))
   const tapView = makeTapView({
     taps: [
       {
         name: "전체",
+        nameCls: ["m-0.5","p-0.5"],
         content: accountData.tableContent,
       },
       {
         name: "입금",
+        nameCls: ["m-0.5","p-0.5"],
         content: (
           <>
             <div>{depositTapview.button}</div>
@@ -126,6 +166,7 @@ export default function Content() {
       },
       {
         name: "출금",
+        nameCls: ["m-0.5","p-0.5"],
         content: (
           <>
             <div>{withdrawTapview.button}</div>
@@ -134,6 +175,7 @@ export default function Content() {
         ),
       },
     ],
+    selectedCls: ["font-semibold"]
   });
   return (
     <>
@@ -144,8 +186,7 @@ export default function Content() {
         accept="text/plain"
         onChange={(e) => handleChange(e)}
       />
-      <div>{deposit.meta.sorts}</div>
-      <div>{deposit.meta.counts}</div>
+      
       <div>{isUpload && tapView.button}</div>
 
       <div>{isUpload && tapView.view}</div>
