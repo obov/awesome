@@ -1,3 +1,4 @@
+
 import { ChangeEvent, useState, useEffect, ChangeEventHandler } from "react";
 import { MakeTable, dataCheckable } from "./hooks/table2";
 import { makeTapView } from "./hooks/tap";
@@ -23,18 +24,8 @@ export default function Content() {
     };
     reader.readAsText(file, "euc=kr");
   };
-  const headers = [
-    "No",
-    "거래일시",
-    "의뢰인/수취인",
-    "출금액(원)",
-    "입금액(원)",
-    "잔액(원)",
-    "출금계좌메모",
-    "적요",
-    "처리점",
-    "구분",
-  ];
+  const headers = process.env.ACCOUNT_HEADER
+  
   const dataConfig = {
     headers,
     checkable: true,
@@ -43,51 +34,10 @@ export default function Content() {
   };
   const accountData = MakeTable({ ...dataConfig, datas: txtData });
   
-  const {sortedDatas:[deposit],notSorted:withdraw} = sorter({ txtData, headers, condition: [{ head: "출금액(원)", type: "equal", val: "0" }]})
-  
-  const dp = [
-    {
-      head: "처리점",
-      type: "equal",
-      val: "노원종",
-    },
-    {
-      head: "처리점",
-      type: "equal",
-      val: "송림동",
-    }
-  ]
+  const {sortedDatas:[deposit],notSorted:withdraw,meta:dwMeta} = sorter({ txtData, headers, condition: [{ head: "출금액(원)", type: "equal", val: "0" }]})
+  const dp = process.env.DEPOSIT_CONDITIONS
   const dpsort = sorter({ txtData:deposit, headers, condition: dp })
-  
-  const wd = [
-    [
-      {
-        head: "출금계좌메모",
-        type: "equal",
-        val: ["화수방아간","홈마트　송림점","강동수산","인농177번상회","청우상회72","화도정육점","중앙떡집"],
-      },
-      {
-        head: "의뢰인/수취인",
-        type: "equal",
-        val: ["홈마트송림점","화도정육점","이삭토스트","에그드랍신포점","신라반점"],
-      }
-    ],
-    {
-      head: "적요",
-      type: "equal",
-      val: ["CMS 공동","FBS출금"],
-    },
-    {
-      head: "적요",
-      type: "equal",
-      val: ["공과금","지로출금"],
-    },
-    {
-      head: "출금계좌메모",
-      type: "include",
-      val: ["급여","퇴직적립금"],
-    },
-  ]
+  const wd = process.env.WITHDRAW_CONDITIONS
   const wdsort = sorter({ txtData:withdraw, headers, condition: wd })
   const dpTable = [...dpsort.sortedDatas,dpsort.notSorted].map((e)=>MakeTable({ ...dataConfig, datas:e}))
   const wdTable = [...wdsort.sortedDatas,wdsort.notSorted].map((e)=>MakeTable({ ...dataConfig, datas:e}))
@@ -96,7 +46,7 @@ export default function Content() {
   const [depositTapview, withdrawTapview] = [
     [
       {
-        name: "입금전체",
+        name: "입금전체 ("+dwMeta[0].counts+")",
         nameCls: ["m-0.5","p-0.5"],
         content: depositData.tableContent,
       },
@@ -118,34 +68,44 @@ export default function Content() {
     ],
     [
       {
-        name: <div>{"출금전체 ( )"}</div>,
+        name: <div>{"출금전체 ("+dwMeta[1].counts+")"}</div>,
         nameCls: ["m-0.5","p-0.5"],
         content: withdrawData.tableContent,
       },
       {
-        name: <div>{"생계비 ( )"}</div>,
+        name: <div>{"생계비 ("+wdsort.meta[0].counts+")"}</div>,
         nameCls: ["m-0.5","p-0.5"],
         content:wdTable[0].tableContent,
       },
       {
-        name:  <div>{"정기출금 ( )"}</div>,
+        name:  <div>{"정기출금 ("+wdsort.meta[1].counts+")"}</div>,
         nameCls: ["m-0.5","p-0.5"],
         content:wdTable[1].tableContent,
       },
       {
-        name: <div>{"공과금 ( )"}</div>,
+        name: <div>{"공과금 ("+wdsort.meta[2].counts+")"}</div>,
         nameCls: ["m-0.5","p-0.5"],
         content: wdTable[2].tableContent,
       },
       {
-        name: <div>{"급여 ( )"}</div>,
+        name: <div>{"급여 ("+wdsort.meta[3].counts+")"}</div>,
         nameCls: ["m-0.5","p-0.5"],
         content: wdTable[3].tableContent,
       },
       {
-        name: <div>{"미분류 ( )"}</div>,
+        name: <div>{"입력제외 ("+wdsort.meta[4].counts+")"}</div>,
         nameCls: ["m-0.5","p-0.5"],
         content: wdTable[4].tableContent,
+      },
+      {
+        name: <div>{"보험 ("+wdsort.meta[5].counts+")"}</div>,
+        nameCls: ["m-0.5","p-0.5"],
+        content: wdTable[5].tableContent,
+      },
+      {
+        name: <div>{"미분류 ("+wdsort.meta[6].counts+")"}</div>,
+        nameCls: ["m-0.5","p-0.5"],
+        content: wdTable[6].tableContent,
       },
     ]
   ].map((e)=> makeTapView({taps:e,selectedCls: ["font-semibold"]}))

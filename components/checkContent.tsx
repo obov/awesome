@@ -2,6 +2,7 @@ import sorter from './sortDetails2'
 import { MakeTable, dataCheckable } from "./hooks/table2";
 import { useState } from 'react';
 import {makeTapView} from './hooks/tap'
+console.log(process.env.customKey)
 export default function check() {
   const checkhead = [
     '#','name','nickname','hobby'
@@ -38,6 +39,7 @@ export default function check() {
       {table[0].tableContent}
       {tv.button}
       {tv.view}
+      <div>{}</div>
     </div>
   )
 }

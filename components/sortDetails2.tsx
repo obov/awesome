@@ -21,7 +21,7 @@ export default function sorter(dataForSort: {
 }): { sortedDatas: any[][][]; meta: meta[]; notSorted: any[][] } {
   let { txtData, headers, condition } = dataForSort;
   
-  const meta = condition.map((con) => {
+  const meta = [...condition,{head:"notSorted",type:"",val:""}].map((con) => {
     if(Array.isArray(con)) {
       const reducedCon = con.reduce((result,current)=>{
         const { head, type, val } = current
@@ -30,11 +30,12 @@ export default function sorter(dataForSort: {
         result.val.push(val)
         return result
       },{ head:[],type:[],val:[] })
-      return {...reducedCon, counts: 0, sorts: [] }
+      return {...reducedCon, counts: 0, sorts: [] as string[] }
     }
-    return { ...con, counts: 0, sorts: [] }
+    return { ...con, counts: 0, sorts: [] as string[] }
   });
   const emptySorted = new Array(condition.length).fill([[]]);
+  console.log(meta)
   if (txtData === undefined || txtData[0].length === 0)
     return { sortedDatas: emptySorted, meta, notSorted: [[]] };
   let sortedDatas = [];
@@ -99,6 +100,8 @@ export default function sorter(dataForSort: {
   condition.forEach((condi, index) => {
     sortedDatas.push(sorting(index === 0 ? txtData : notSorted, condi, index));
   });
+  meta[condition.length].counts = notSorted.length
+  meta[condition.length].sorts = notSorted.map((row)=>row[0])
   return {
     sortedDatas,
     notSorted,
