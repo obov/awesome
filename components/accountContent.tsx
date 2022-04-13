@@ -60,20 +60,22 @@ export default function Content() {
   const dpsort = sorter({ txtData:deposit, headers, condition: dp })
   
   const wd = [
-    {
-      head: "출금계좌메모",
-      type: "equal",
-      val: ["화수방아간","홈마트　송림점","강동수산","인농177번상회","청우상회72","화도정육점","중앙떡집"],
-    },
+    [
+      {
+        head: "출금계좌메모",
+        type: "equal",
+        val: ["화수방아간","홈마트　송림점","강동수산","인농177번상회","청우상회72","화도정육점","중앙떡집"],
+      },
+      {
+        head: "의뢰인/수취인",
+        type: "equal",
+        val: ["홈마트송림점","화도정육점","이삭토스트","에그드랍신포점","신라반점"],
+      }
+    ],
     {
       head: "적요",
       type: "equal",
       val: ["CMS 공동","FBS출금"],
-    },
-    {
-      head: "의뢰인/수취인",
-      type: "equal",
-      val: ["홈마트송림점","화도정육점","이삭토스트","에그드랍신포점","신라반점"],
     },
     {
       head: "적요",
@@ -143,7 +145,7 @@ export default function Content() {
       {
         name: <div>{"미분류 ( )"}</div>,
         nameCls: ["m-0.5","p-0.5"],
-        content: wdTable[5].tableContent,
+        content: wdTable[4].tableContent,
       },
     ]
   ].map((e)=> makeTapView({taps:e,selectedCls: ["font-semibold"]}))

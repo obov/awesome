@@ -1,4 +1,7 @@
-export default function sorter (dataForSort:{txtData: any[][],headers:string[],condition:{head:string, type:string, val:string|string[]}}) {
+interface condition{
+  head:string, type:string, val:string|string[]
+}
+export default function sorter (dataForSort:{txtData: any[][],headers:string[],condition:condition}) {
   let {txtData, headers, condition} = dataForSort
   const meta = { condition, counts:0 ,sorts:[] as string[]}
   if(txtData===undefined||txtData[0].length===0) return ({sorted:[[]],meta})
