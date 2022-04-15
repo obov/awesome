@@ -1,9 +1,18 @@
-import sorter from './sortDetails2'
-import { MakeTable, dataCheckable } from "./hooks/table2";
+import { MakeTable, dataCheckable } from "./hooks/table3";
+import moment from "moment"
+import { makeSlideMenu } from "./hooks/fixedButtonSlideMenu"
 import { useState } from 'react';
 import {makeTapView} from './hooks/tap'
-console.log(process.env.customKey)
 export default function check() {
+  const checkdata = [
+    ['1','name1','nickname1','hobby1'],
+    ['2','name2','nickname2','hobby2'],
+    ['3','name3','nickname3','hobby3'],
+    ['4','name4','nickname4','hobby4'],
+    ['5','name5','nickname5','hobby5'],
+  ]
+  const dateList = ["2022.03.31 19:21:20","2022.03.29 19:21:20","2022.03.23 19:21:20",].map((d)=>moment(d).startOf('day'))
+  const date =moment("2022.03.23 12:21:20").startOf('day')
   const checkhead = [
     '#','name','nickname','hobby'
   ]
@@ -13,33 +22,22 @@ export default function check() {
     boxCls: ["text-red-200"],
     checkedDataCls: ["shadow", "shadow-slate-400", "rounded-xl"],
   }
-  const checkdata = [
-    ['1','name1','nickname1','hobby1'],
-    ['2','name2','nickname2','hobby2'],
-    ['3','name3','nickname3','hobby3'],
-    ['4','name4','nickname4','hobby4'],
-    ['5','name5','nickname5','hobby5'],
-  ]
   
-  const checkSort = sorter({txtData:checkdata,headers:checkhead,condition:[
-    [{
-      head:'#',type:'include',val:'1'
-    },
-    {
-      head:'#',type:'include',val:'3'
-    }],
-  ]})
-  const table = checkSort.sortedDatas.map((e)=>MakeTable({...dataConfig,datas:e}))
-  const tv = makeTapView({
-    taps:[{ name:'hi',content:table[0].tableContent}]
-  })
+  const table = MakeTable({ ...dataConfig, datas: checkdata })
+  const slideMenuConfig = {
+    fixedCls: ["bg-red-200","top-0","transition-all","w-96"],
+    menuContents: <div>hi</div>,
+    button : <div>hi</div>
+  }
+  const slideMenu = makeSlideMenu(slideMenuConfig)
+  dateList.forEach((d)=> (console.log(d === date)))
+  dateList.forEach((d)=> (console.log(d)))
+  console.log(date)
   return (
     <div>
-      {checkSort.sortedDatas[0][0]}
-      {table[0].tableContent}
-      {tv.button}
-      {tv.view}
-      <div>{}</div>
+      <div>{table.tableContent}</div>
+      <div>{slideMenu.btnForMenu}</div>
+      <div>{slideMenu.menu}</div>
     </div>
   )
 }

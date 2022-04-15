@@ -1,6 +1,8 @@
 import moment, { Moment } from "moment";
+import {mark} from "./calenderMark"
 import { useState } from "react";
 import Daybox from "./daybox";
+
 interface dayboxClasses {
   textColor?: string;
   backgroundColor?: string;
@@ -18,6 +20,8 @@ interface calenderParameter {//2. calenderParameter에 해당조건에 맞춰 cl
   sundayCls?: dayboxClasses;
   saturdayCls?: dayboxClasses;
   normalCls?: dayboxClasses;
+  // dateList: string[]
+  // sortList:boolean[]
 }
 
 const defaultClass = ["shadow", "align-text-top", "rounded", "p-1", "group"]; // daybox 기본적인 ClassName
@@ -77,7 +81,8 @@ export default function calender(parameter: calenderParameter) {
     num: number,
     callback: (o: number, index: number) => any
   ) => Array(num).fill(0).map(callback);
-
+  
+  // const mark = mark()
   const content: any = (
     <table>
       <tbody>
@@ -111,7 +116,7 @@ export default function calender(parameter: calenderParameter) {
   };
   return {
     content, // 달력
-    showingMonth, // 년월 표시 용도 Momentum 개채로 표시형식 format 함수로 표시형식 변경 가능
+    showingMonth , // 년월 표시 용도 Momentum 개채로 표시형식 format 함수로 표시형식 변경 가능
     subtractMonth, // month 값 감소 함수
     addMonth, // month 값 증가 함수
   };

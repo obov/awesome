@@ -1,3 +1,4 @@
+import moment from "moment"
 interface condition {
   head: string | string[];
   type: string | string[];
@@ -19,8 +20,8 @@ export default function sorter(dataForSort: {
   headers: string[];
   condition: (condition | condition[])[];
 }): { sortedDatas: any[][][]; meta: meta[]; notSorted: any[][] } {
-  let { txtData, headers, condition } = dataForSort;
-  
+  const { txtData, headers, condition } = dataForSort;
+  const howmany = condition.length
   const meta = [...condition,{head:"notSorted",type:"",val:""}].map((con) => {
     if(Array.isArray(con)) {
       const reducedCon = con.reduce((result,current)=>{
@@ -30,19 +31,21 @@ export default function sorter(dataForSort: {
         result.val.push(val)
         return result
       },{ head:[],type:[],val:[] })
-      return {...reducedCon, counts: 0, sorts: [] as string[] }
+      return {...reducedCon, howmany, counts: 0, sorts: [] as string[], dates:[] }
     }
-    return { ...con, counts: 0, sorts: [] as string[] }
+    return { ...con, howmany, counts: 0, sorts: [] as string[], dates:[] }
   });
   const emptySorted = new Array(condition.length).fill([[]]);
-  console.log(meta)
+  
   if (txtData === undefined || txtData[0].length === 0)
     return { sortedDatas: emptySorted, meta, notSorted: [[]] };
   let sortedDatas = [];
   
-  const whenDataSort = (index: number, id: string) => {
-    meta[index].counts += 1;
-    meta[index].sorts.push(id);
+  const whenDataSort = (index: number, id: string, date:string) => {
+    const metaToSort = meta[index]
+    metaToSort.counts += 1;
+    metaToSort.sorts.push(id);
+    metaToSort.dates.push(date);
   };
 
   let notSorted = [] as any[];
@@ -51,7 +54,7 @@ export default function sorter(dataForSort: {
     notSorted = [];
     const lastSort = (bool,row)=> {
       if (bool) {
-        whenDataSort(index, row[0]);
+        whenDataSort(index, row[0],moment(row[1]).format("YYYY-MM-DD"));
         sorted.push(row);
       } else {
         notSorted.push(row);
